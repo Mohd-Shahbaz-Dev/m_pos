@@ -105,81 +105,102 @@ class _LoginFormState extends State<LoginForm> {
                 // color: const Color.fromARGB(255, 243, 241, 241),
                 padding: EdgeInsets.all(100),
 
-                child: Column(
-                  children: [
-                    FlutterLogo(size: 60),
-                    SizedBox(height: 30),
-                    Text(
-                      'Sign In',
-                      style: TextStyle(
-                        color: Colors.blueAccent,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 30),
-                    TextWidget(
-                      controllerName: email,
-                      hint: 'Enter Your Email',
-                      labelText: 'Email',
-                      prefixIcon: Icons.email,
-                    ),
-                    SizedBox(height: 20),
-                    TextWidget(
-                      controllerName: pass,
-                      hint: 'Enter Your Password',
-                      labelText: 'Password',
-                      pass: isPasswordHidden,
-                      prefixIcon: Icons.lock,
-                      suffixIcon: isPasswordHidden
-                          ? Icons.visibility_off
-                          : Icons.visibility,
-                      onSuffixPressed: () {
-                        setState(() {
-                          isPasswordHidden = !isPasswordHidden;
-                        });
-                      },
-                    ),
-                    SizedBox(height: 8), 
+                child: BlocConsumer<AuthBloc,AuthState>(
+                 listener: (context, state) {
+    if (state is AuthFailureState) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(state.msg)),
+      );
+    }
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => RegForm(),
-                              ),
-                            );
-                          },
-                          child: Text('Create New Account'),
+    if (state is AuthSuccessState) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => MyDesktop()),
+      );
+    }
+  },
+  builder: (context, state) {
+    if (state is AuthLodingState) {
+      return const Center(child: CircularProgressIndicator());
+    }
+  
+                  return Column(
+                    children: [
+                      FlutterLogo(size: 60),
+                      SizedBox(height: 30),
+                      Text(
+                        'Sign In',
+                        style: TextStyle(
+                          color: Colors.blueAccent,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
-                        TextButton(
-                          onPressed: () {},
-                          child: Text('Forgot Password?'),
-                        ),
-                      ],
-                    ),
-                    
-                    SizedBox(height: 30),
-                    Button(
-                      title: 'Login',
-                      onPressed: () {
-                        BlocProvider.of<AuthBloc>(context,listen: false).add(
-                          LoginEvent('gffh', '5555')
-                        );
-                        Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => MyDesktop(),
-                              ),
-                            );
-                      },
-                    ),
-                  ],
-                ),
+                      ),
+                      SizedBox(height: 30),
+                      TextWidget(
+                        controllerName: email,
+                        hint: 'Enter Your Email',
+                        labelText: 'Email',
+                        prefixIcon: Icons.email,
+                      ),
+                      SizedBox(height: 20),
+                      TextWidget(
+                        controllerName: pass,
+                        hint: 'Enter Your Password',
+                        labelText: 'Password',
+                        pass: isPasswordHidden,
+                        prefixIcon: Icons.lock,
+                        suffixIcon: isPasswordHidden
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        onSuffixPressed: () {
+                          setState(() {
+                            isPasswordHidden = !isPasswordHidden;
+                          });
+                        },
+                      ),
+                      SizedBox(height: 8), 
+                  
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => RegForm(),
+                                ),
+                              );
+                            },
+                            child: Text('Create New Account'),
+                          ),
+                          TextButton(
+                            onPressed: () {},
+                            child: Text('Forgot Password?'),
+                          ),
+                        ],
+                      ),
+                      
+                      SizedBox(height: 30),
+                      Button(
+                        title: 'Login',
+                        onPressed: () {
+                          BlocProvider.of<AuthBloc>(context,listen: false).add(
+                            LoginEvent(email.text, pass.text)
+                          );
+                          // Navigator.push(
+                          //       context,
+                          //       MaterialPageRoute(
+                          //         builder: (context) => MyDesktop(),
+                          //       ),
+                          //     );
+                        },
+                      ),
+                    ],
+                  );
+  }),
               ),
             ),
           ],
